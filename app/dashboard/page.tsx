@@ -1,5 +1,6 @@
 import { getPagos, calcularKPIs, calcularIngresosPorCurso } from '@/lib/supabase'
 import { KpiCards } from '@/components/ui/KpiCards'
+import { AlertList } from '@/components/ui/AlertList'
 import { TablaPagos } from '@/components/ui/TablaPagos'
 import { ChartIngresos } from '@/components/charts/ChartIngresos'
 
@@ -33,19 +34,7 @@ export default async function DashboardPage() {
         {/* KPIs */}
         <KpiCards kpis={kpis} />
 
-        {kpis.totalAbsoluto > 0 && kpis.numReembolsos / kpis.totalAbsoluto > 0.1 && (
-          <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-slate-700 shadow-sm">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">⚠️</span>
-              <div className="leading-tight">
-                <p className="font-semibold text-slate-900">Alerta operativa</p>
-                <p>
-                  La tasa de reembolsos actual ({kpis.numReembolsos}) supera el umbral del 10% establecido por la academia. Monitorear los últimos casos.
-                </p>
-              </div>
-            </div>
-          </section>
-        )}
+        <AlertList kpis={kpis} pagos={pagos} />
 
         {/* Chart */}
         <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
