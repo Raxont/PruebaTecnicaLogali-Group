@@ -7,15 +7,24 @@ interface KpiCardsProps {
 }
 
 function formatCurrency(amount: number, currency: string): string {
+  const decimals = (amount === 0 || currency === 'COP') ? 0 : 2;
+
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: currency,
-    minimumFractionDigits: currency === 'USD' ? 2 : 0,
-    maximumFractionDigits: currency === 'USD' ? 2 : 0,
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
   }).format(amount)
 }
 
 export function KpiCards({ kpis }: KpiCardsProps) {
+  const totalTransacciones = kpis.totalAbsoluto
+  const reembolsosPct = totalTransacciones > 0 ? (kpis.numReembolsos / totalTransacciones) * 100 : 0
+  const conversionPct = totalTransacciones > 0 ? (kpis.numPagos / totalTransacciones) * 100 : 0
+
+  const reembolsosText = `↓ ${reembolsosPct.toFixed(1)}% del total de transacciones.`
+  const conversionText = `↑ ${conversionPct.toFixed(1)}% de tasa de conversión.`
+
   const cards = [
     {
       label: 'Ingresos Totales',
@@ -33,6 +42,7 @@ export function KpiCards({ kpis }: KpiCardsProps) {
       label: 'Pagos Completados',
       value: kpis.numPagos.toString(),
       sub: 'transacciones exitosas',
+      extra: conversionText,
       icon: '✅',
       accent: 'from-blue-500 to-indigo-600',
       bg: 'bg-blue-50 dark:bg-blue-950/30',
@@ -42,6 +52,7 @@ export function KpiCards({ kpis }: KpiCardsProps) {
       label: 'Reembolsos',
       value: kpis.numReembolsos.toString(),
       sub: 'pagos revertidos',
+      extra: reembolsosText,
       icon: '↩️',
       accent: 'from-amber-500 to-orange-600',
       bg: 'bg-amber-50 dark:bg-amber-950/30',
@@ -79,6 +90,11 @@ export function KpiCards({ kpis }: KpiCardsProps) {
               {card.sub && (
                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 truncate">
                   {card.sub}
+                </p>
+              )}
+              {card.extra && (
+                <p className="text-xs mt-1 font-medium text-emerald-600 dark:text-emerald-400 truncate">
+                  {card.extra}
                 </p>
               )}
             </div>

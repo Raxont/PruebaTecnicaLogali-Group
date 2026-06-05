@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import type { Pago, KPIs, IngresosPorCurso } from '@/types/pago'
+import type { Pago, KPIs, IngresosPorCurso, Moneda } from '@/types/pago'
 
 // Solo se usa en Server Components / API Routes — la anon key nunca llega al cliente
 const supabase = createClient(
@@ -25,26 +25,37 @@ export function calcularKPIs(pagos: Pago[]): KPIs {
   const completados = pagos.filter((p) => p.estado === 'completed')
   const reembolsos = pagos.filter((p) => p.estado === 'refunded')
 
-  // Ingresos agrupados por moneda
-  const ingresosPorMoneda = completados.reduce<Record<string, number>>((acc, p) => {
-    const m = p.moneda.toUpperCase()
-    acc[m] = (acc[m] ?? 0) + p.importe
+  const tasasCambio: Record<Moneda, number> = {
+    COP: 1,
+    USD: 3600,
+    EUR: 4200,
+  }
+
+  // Ingresos agrupados por moneda original para el subtexto
+  const ingresosPorMoneda = completados.reduce<Record<Moneda, number>>((acc, p) => {
+    acc[p.moneda] = (acc[p.moneda] ?? 0) + p.importe
     return acc
-  }, {})
+  }, {
+    COP: 0,
+    USD: 0,
+    EUR: 0,
+  })
 
-  // Moneda dominante (la de mayor volumen)
-  const monedaDominante =
-    Object.entries(ingresosPorMoneda).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'COP'
+  // Total unificado en COP usando la tasa de referencia
+  const ingresosTotales = completados.reduce((total, pago) => {
+    const tasa = tasasCambio[pago.moneda]
+    return total + pago.importe * tasa
+  }, 0)
 
-  const ingresosTotales = ingresosPorMoneda[monedaDominante] ?? 0
   const ticketMedio = completados.length > 0 ? ingresosTotales / completados.length : 0
 
   return {
     ingresosTotales,
-    monedaDominante,
+    monedaDominante: 'COP',
     numPagos: completados.length,
     numReembolsos: reembolsos.length,
     ticketMedio,
+    totalAbsoluto: pagos.length,
     ingresosPorMoneda,
   }
 }
@@ -52,19 +63,26 @@ export function calcularKPIs(pagos: Pago[]): KPIs {
 export function calcularIngresosPorCurso(pagos: Pago[]): IngresosPorCurso[] {
   const mapa = new Map<string, IngresosPorCurso>()
 
+  const tasasCambio: Record<Moneda, number> = {
+    COP: 1,
+    USD: 3600,
+    EUR: 4200,
+  }
+
   pagos
     .filter((p) => p.estado === 'completed')
     .forEach((p) => {
+      const ingresoEnCOP = p.importe * tasasCambio[p.moneda]
       const existing = mapa.get(p.curso)
       if (existing) {
-        existing.ingresos += p.importe
+        existing.ingresos += ingresoEnCOP
         existing.pagos += 1
       } else {
         mapa.set(p.curso, {
           curso: p.curso,
-          ingresos: p.importe,
+          ingresos: ingresoEnCOP,
           pagos: 1,
-          moneda: p.moneda.toUpperCase(),
+          moneda: 'COP',
         })
       }
     })

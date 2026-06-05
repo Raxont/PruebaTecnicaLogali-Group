@@ -19,12 +19,21 @@ const ESTADO_CONFIG: Record<EstadoPago, { label: string; classes: string }> = {
 }
 
 function formatImporte(importe: number, moneda: string): string {
-  return new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: moneda.toUpperCase(),
-    minimumFractionDigits: moneda.toUpperCase() === 'USD' ? 2 : 0,
-    maximumFractionDigits: moneda.toUpperCase() === 'USD' ? 2 : 0,
+  const monedaUpper = moneda.toUpperCase()
+  
+  // 1. Formateamos el número base con la estructura de Colombia (puntos en miles, comas en decimales)
+  const numeroFormateado = new Intl.NumberFormat('es-CO', {
+    minimumFractionDigits: monedaUpper === 'COP' ? 0 : 2,
+    maximumFractionDigits: monedaUpper === 'COP' ? 0 : 2,
   }).format(importe)
+
+  // 2. Si es COP, retornamos el clásico "$ 120.000"
+  if (monedaUpper === 'COP') {
+    return `$ ${numeroFormateado}`
+  }
+
+  // 3. Si es USD o cualquier otra moneda, forzamos la estructura "$ 20,00 USD"
+  return `$ ${numeroFormateado} ${monedaUpper}`
 }
 
 function formatFecha(fecha: string): string {

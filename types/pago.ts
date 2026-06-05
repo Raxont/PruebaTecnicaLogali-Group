@@ -19,6 +19,7 @@ export interface KPIs {
   numPagos: number
   numReembolsos: number
   ticketMedio: number
+  totalAbsoluto: number
   ingresosPorMoneda: Record<Moneda, number>
 }
 
