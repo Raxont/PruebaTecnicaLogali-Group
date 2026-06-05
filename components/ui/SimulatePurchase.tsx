@@ -1,13 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 
 const COURSES = ['Excel Avanzado', 'Power BI','SQL', 'Java']
 const MONEDAS = ['COP', 'USD', 'EUR']
 
-export function SimulatePurchase() {
-  const router = useRouter()
+interface SimulatePurchaseProps {
+  onSuccess?: () => void
+}
+
+export function SimulatePurchase({ onSuccess }: SimulatePurchaseProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [nombre, setNombre] = useState('')
@@ -40,7 +42,7 @@ export function SimulatePurchase() {
         setCurso(COURSES[0])
         setImporte('')
         setMoneda(MONEDAS[0])
-        router.refresh()
+        onSuccess?.()
       } else {
         alert(json.error || 'Error al guardar')
       }

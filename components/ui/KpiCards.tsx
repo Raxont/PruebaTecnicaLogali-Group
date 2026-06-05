@@ -3,7 +3,8 @@
 import type { KPIs } from '@/types/pago'
 
 interface KpiCardsProps {
-  kpis: KPIs
+  kpis: KPIs | null
+  isLoading?: boolean
 }
 
 function formatCurrency(amount: number, currency: string): string {
@@ -17,7 +18,38 @@ function formatCurrency(amount: number, currency: string): string {
   }).format(amount)
 }
 
-export function KpiCards({ kpis }: KpiCardsProps) {
+export function KpiCards({ kpis, isLoading = false }: KpiCardsProps) {
+  // Skeletons for loading state
+  if (isLoading || !kpis) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-5"
+          >
+            {/* Gradient accent bar */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-300 to-slate-200 dark:from-slate-700 dark:to-slate-600" />
+
+            <div className="space-y-3">
+              {/* Label skeleton */}
+              <div className="h-3 w-24 bg-slate-300 dark:bg-slate-700 rounded-full animate-pulse" />
+              
+              {/* Value skeleton */}
+              <div className="h-7 w-32 bg-slate-300 dark:bg-slate-700 rounded-lg animate-pulse" />
+              
+              {/* Sub skeleton */}
+              <div className="h-3 w-28 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
+              
+              {/* Extra skeleton */}
+              <div className="h-3 w-40 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   const totalTransacciones = kpis.totalAbsoluto
   const reembolsosPct = totalTransacciones > 0 ? (kpis.numReembolsos / totalTransacciones) * 100 : 0
   const conversionPct = totalTransacciones > 0 ? (kpis.numPagos / totalTransacciones) * 100 : 0

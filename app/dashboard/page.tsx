@@ -1,16 +1,38 @@
-import { getPagos, calcularKPIs, calcularIngresosPorCurso } from '@/lib/supabase'
+'use client'
+
+import { useState, useEffect } from 'react'
+import type { Pago, KPIs, IngresosPorCurso } from '@/types/pago'
 import { KpiCards } from '@/components/ui/KpiCards'
 import { SimulatePurchase } from '@/components/ui/SimulatePurchase'
 import { AlertList } from '@/components/ui/AlertList'
 import { TablaPagos } from '@/components/ui/TablaPagos'
 import { ChartIngresos } from '@/components/charts/ChartIngresos'
 
-export const dynamic = 'force-dynamic'
+export default function DashboardPage() {
+  const [isLoading, setIsLoading] = useState(true)
+  const [pagos, setPagos] = useState<Pago[]>([])
+  const [kpis, setKpis] = useState<KPIs | null>(null)
+  const [ingresosPorCurso, setIngresosPorCurso] = useState<IngresosPorCurso[]>([])
 
-export default async function DashboardPage() {
-  const pagos = await getPagos()
-  const kpis = calcularKPIs(pagos)
-  const ingresosPorCurso = calcularIngresosPorCurso(pagos)
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      setIsLoading(true)
+      try {
+        const response = await fetch('/api/dashboard')
+        if (!response.ok) throw new Error('Error al cargar datos')
+        const data = await response.json()
+        setPagos(data.pagos)
+        setKpis(data.kpis)
+        setIngresosPorCurso(data.ingresosPorCurso)
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchDashboardData()
+  }, [])
 
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 px-4 py-8 sm:px-6 lg:px-10">
@@ -34,13 +56,22 @@ export default async function DashboardPage() {
 
         {/* KPIs */}
         <div className="flex items-center justify-between gap-4">
-          <KpiCards kpis={kpis} />
+          <KpiCards kpis={kpis} isLoading={isLoading} />
           <div className="hidden sm:flex">
-            <SimulatePurchase />
+            <SimulatePurchase onSuccess={() => {
+              // Reload dashboard data after successful purchase
+              fetch('/api/dashboard')
+                .then(res => res.json())
+                .then(data => {
+                  setPagos(data.pagos)
+                  setKpis(data.kpis)
+                  setIngresosPorCurso(data.ingresosPorCurso)
+                })
+            }} />
           </div>
         </div>
 
-        <AlertList kpis={kpis} pagos={pagos} />
+        {kpis && pagos.length > 0 && <AlertList kpis={kpis} pagos={pagos} />}
 
         {/* Chart */}
         <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
@@ -50,7 +81,11 @@ export default async function DashboardPage() {
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">Solo pagos completados</p>
           </div>
-          <ChartIngresos data={ingresosPorCurso} />
+          {isLoading ? (
+            <div className="h-80 bg-slate-100 dark:bg-slate-800/50 rounded-lg animate-pulse" />
+          ) : (
+            <ChartIngresos data={ingresosPorCurso} />
+          )}
         </section>
 
         {/* Tabla */}
@@ -61,7 +96,15 @@ export default async function DashboardPage() {
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">Filtra, busca y exporta</p>
           </div>
-          <TablaPagos pagos={pagos} />
+          {isLoading ? (
+            <div className="space-y-2">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-12 bg-slate-100 dark:bg-slate-800/50 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <TablaPagos pagos={pagos} />
+          )}
         </section>
 
       </div>
