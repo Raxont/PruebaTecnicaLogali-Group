@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 const COURSES = ['Excel Avanzado', 'Power BI','SQL', 'Java']
@@ -16,6 +16,15 @@ export function SimulatePurchase() {
   const [importe, setImporte] = useState('')
   const [moneda, setMoneda] = useState(MONEDAS[0])
 
+  const [toast, setToast] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [toast])
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
@@ -24,6 +33,7 @@ export function SimulatePurchase() {
       const res = await fetch('/api/pagos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       const json = await res.json()
       if (res.ok) {
+        setToast(`¡Pago registrado con éxito (${json.pago.id_pago})!`)
         setOpen(false)
         setNombre('')
         setEmail('')
@@ -91,6 +101,13 @@ export function SimulatePurchase() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-3 text-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-300">
+          <span>✓</span>
+          <p className="text-sm font-medium">{toast}</p>
         </div>
       )}
     </>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import type { Pago, EstadoPago } from '@/types/pago'
 
 interface TablaPagosProps {
@@ -67,8 +68,31 @@ function exportToCSV(pagos: Pago[]): void {
 }
 
 export function TablaPagos({ pagos }: TablaPagosProps) {
+  const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
   const [estadoFiltro, setEstadoFiltro] = useState<EstadoPago | 'todos'>('todos')
+  const [reembolsando, setReembolsando] = useState<string | null>(null)
+
+  async function handleReembolsar(id_pago: string) {
+    setReembolsando(id_pago)
+    try {
+      const res = await fetch('/api/pagos', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_pago, estado: 'refunded' }),
+      })
+      if (res.ok) {
+        router.refresh()
+      } else {
+        alert('Error al reembolsar')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Error de red')
+    } finally {
+      setReembolsando(null)
+    }
+  }
 
   const pagosFiltrados = useMemo(() => {
     return pagos.filter((p) => {
@@ -191,9 +215,22 @@ export function TablaPagos({ pagos }: TablaPagosProps) {
                       {formatImporte(pago.importe, pago.moneda)}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${estado.classes}`}>
-                        {estado.label}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${estado.classes}`}>
+                          {estado.label}
+                        </span>
+                        {pago.estado === 'completed' && (
+                          <button
+                            type="button"
+                            onClick={() => handleReembolsar(pago.id_pago)}
+                            disabled={reembolsando === pago.id_pago}
+                            className="text-xs px-2 py-1 rounded text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50 transition"
+                            title="Reembolsar pago"
+                          >
+                            {reembolsando === pago.id_pago ? '⏳' : '↩️'}
+                          </button>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-slate-500 dark:text-slate-400 whitespace-nowrap">
                       {formatFecha(pago.fecha)}

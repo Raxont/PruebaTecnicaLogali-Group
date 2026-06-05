@@ -62,3 +62,34 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json()
+    const { id_pago, estado } = body
+
+    if (!id_pago || !estado) {
+      return NextResponse.json({ error: 'Missing id_pago or estado' }, { status: 400 })
+    }
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+
+    const { error } = await supabase
+      .from('pagos')
+      .update({ estado })
+      .eq('id_pago', id_pago)
+
+    if (error) {
+      console.error('Supabase update error', error.message)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ ok: true })
+  } catch (err) {
+    console.error('API /pagos PATCH error', err)
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+  }
+}
