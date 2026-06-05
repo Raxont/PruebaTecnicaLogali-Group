@@ -1,5 +1,7 @@
 "use client"
 
+// * Componente que muestra alertas operativas y notificaciones derivadas
+// * de los KPIs. Mantiene estado local para cerrar alertas.
 import { useState } from 'react'
 import type { KPIs, Pago, Moneda } from '@/types/pago'
 import { formatCurrencyCOP } from '@/lib/formatters'

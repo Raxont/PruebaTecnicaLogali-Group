@@ -1,3 +1,6 @@
+// ? API route para crear/leer/actualizar pagos.
+// ! Esta ruta utiliza la `SUPABASE_SERVICE_ROLE_KEY` internamente y
+// ! debe ejecutarse únicamente en el servidor.
 import { NextResponse } from 'next/server'
 import { getPagos } from '@/lib/supabase'
 import { createClient } from '@supabase/supabase-js'
@@ -5,6 +8,7 @@ import { createClient } from '@supabase/supabase-js'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
+  // * Devuelve todos los pagos para la UI del dashboard.
   const pagos = await getPagos()
   return NextResponse.json(pagos)
 }
@@ -14,7 +18,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { nombre, email, curso, importe, moneda } = body
 
-      if (!nombre || !curso || !importe || !moneda) {
+    if (!nombre || !curso || !importe || !moneda) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
     }
 
@@ -23,7 +27,7 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // Obtener último id_pago y generar siguiente
+    // Obtener último id_pago y generar siguiente (secuencia simple)
     const { data: lastRow } = await supabase
       .from('pagos')
       .select('id_pago')
@@ -38,17 +42,17 @@ export async function POST(request: Request) {
       nextId = `PAY-${String(n).padStart(3, '0')}`
     }
 
-      const newPago = {
-        id_pago: nextId,
-        nombre,
-        email: email ?? null,
-        curso,
-        importe: Number(importe),
-        moneda,
-        estado: 'completed',
-        // Ajuste de zona horaria: restar 5 horas para hora Colombia (UTC-5)
-        fecha: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-      }
+    const newPago = {
+      id_pago: nextId,
+      nombre,
+      email: email ?? null,
+      curso,
+      importe: Number(importe),
+      moneda,
+      estado: 'completed',
+      // Ajuste de zona horaria: restar 5 horas para hora Colombia (UTC-5)
+      fecha: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+    }
 
     const { error } = await supabase.from('pagos').insert(newPago)
     if (error) {

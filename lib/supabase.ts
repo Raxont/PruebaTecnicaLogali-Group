@@ -1,3 +1,6 @@
+// ? Cliente Supabase usado únicamente en rutas server / server components.
+// ? El `SUPABASE_SERVICE_ROLE_KEY` se usa para operaciones seguras server-side.
+// ! NO exponer esta clave al cliente: crearClient aquí es server-only.
 import { createClient } from '@supabase/supabase-js'
 import type { Pago, KPIs, IngresosPorCurso, Moneda } from '@/types/pago'
 
@@ -7,6 +10,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+// * Devuelve todos los pagos ordenados por fecha (descendente).
 export async function getPagos(): Promise<Pago[]> {
   const { data, error } = await supabase
     .from('pagos')
@@ -21,6 +25,8 @@ export async function getPagos(): Promise<Pago[]> {
   return (data ?? []) as Pago[]
 }
 
+// * Calcula KPIs principales a partir de la lista de pagos.
+// ? Se unifica todo a COP usando las tasas definidas aquí como referencia.
 export function calcularKPIs(pagos: Pago[]): KPIs {
   const completados = pagos.filter((p) => p.estado === 'completed')
   const reembolsos = pagos.filter((p) => p.estado === 'refunded')
@@ -60,6 +66,7 @@ export function calcularKPIs(pagos: Pago[]): KPIs {
   }
 }
 
+// * Agrupa ingresos por curso y devuelve los totales en COP.
 export function calcularIngresosPorCurso(pagos: Pago[]): IngresosPorCurso[] {
   const mapa = new Map<string, IngresosPorCurso>()
 

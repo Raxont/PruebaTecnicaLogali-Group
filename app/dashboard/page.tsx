@@ -1,5 +1,7 @@
-'use client'
+ 'use client'
 
+// * Componente principal del dashboard (client-side): carga datos y muestra widgets.
+// ? Mantener la carga de datos en el cliente para simplicidad y evitar SSR excesivo.
 import { useState, useEffect } from 'react'
 import type { Pago, KPIs, IngresosPorCurso } from '@/types/pago'
 import { KpiCards } from '@/components/ui/KpiCards'
@@ -25,6 +27,7 @@ export default function DashboardPage() {
         setKpis(data.kpis)
         setIngresosPorCurso(data.ingresosPorCurso)
       } catch (error) {
+        // ! Log de error: importante para detectar fallos en la API del dashboard
         console.error('Error fetching dashboard data:', error)
       } finally {
         setIsLoading(false)

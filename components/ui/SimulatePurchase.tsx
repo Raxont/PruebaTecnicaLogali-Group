@@ -1,5 +1,7 @@
-'use client'
+ 'use client'
 
+// * Pequeño componente para simular una compra desde la UI.
+// ? Solo usado en desarrollo o demostraciones; inserta un registro via API.
 import { useState, useEffect } from 'react'
 
 const COURSES = ['Excel Avanzado', 'Power BI','SQL', 'Java']

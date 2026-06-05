@@ -1,3 +1,5 @@
+// * Skeleton de carga para el dashboard. Usa marcadores visuales mientras
+// * se obtienen los datos reales.
 export default function DashboardLoading() {
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 px-4 py-8 sm:px-6 lg:px-10">

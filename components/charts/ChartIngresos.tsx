@@ -1,5 +1,7 @@
-'use client'
+ 'use client'
 
+// * Componente de gráfico de barras que muestra ingresos por curso.
+// ? Usa `recharts` y formatea números con utilidades locales.
 import { useEffect, useRef, useState } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,

@@ -1,5 +1,7 @@
-'use client'
+ 'use client'
 
+// * Componente que renderiza las tarjetas de KPIs. Recibe `kpis` calculados
+// * desde el backend y ofrece un estado skeleton mientras carga.
 import type { KPIs } from '@/types/pago'
 import { formatCurrencyLocalized, formatAmount } from '@/lib/formatters'
 

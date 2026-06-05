@@ -1,5 +1,7 @@
-'use client'
+ 'use client'
 
+// * Componente de tabla que muestra, filtra y exporta pagos.
+// ? Contiene helpers UI-only como `exportToCSV` y acciones de reembolso.
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Pago, EstadoPago } from '@/types/pago'
@@ -21,6 +23,7 @@ const ESTADO_CONFIG: Record<EstadoPago, { label: string; classes: string }> = {
 
 import { formatAmount, formatDateShort } from '@/lib/formatters'
 
+// * Exporta la lista de pagos (filtrada) a CSV con BOM para Excel.
 function exportToCSV(pagos: Pago[]): void {
   const headers = ['ID Pago', 'Nombre', 'Email', 'Curso', 'Importe', 'Moneda', 'Estado', 'Fecha']
   const rows = pagos.map((p) => [
