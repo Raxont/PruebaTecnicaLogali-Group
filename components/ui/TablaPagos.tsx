@@ -142,8 +142,20 @@ export function TablaPagos({ pagos }: TablaPagosProps) {
           <tbody>
             {pagosFiltrados.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-slate-400 text-sm">
-                  No se encontraron pagos con los filtros aplicados
+                <td colSpan={6}>
+                  <div className="flex flex-col items-center justify-center py-14 gap-3 text-slate-400">
+                    <svg className="w-10 h-10 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <p className="text-sm font-medium">No se encontraron pagos que coincidan con los filtros</p>
+                    <button
+                      onClick={() => { setBusqueda(''); setEstadoFiltro('todos') }}
+                      className="text-xs text-blue-500 hover:text-blue-600 hover:underline transition"
+                    >
+                      Limpiar filtros
+                    </button>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -155,9 +167,8 @@ export function TablaPagos({ pagos }: TablaPagosProps) {
                 return (
                   <tr
                     key={pago.id_pago}
-                    className={`border-b border-slate-100 dark:border-slate-800 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/40 ${
-                      i % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-slate-50/50 dark:bg-slate-800/20'
-                    }`}
+                    className={`border-b border-slate-100 dark:border-slate-800 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/40 ${i % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-slate-50/50 dark:bg-slate-800/20'
+                      }`}
                   >
                     <td className="px-4 py-3 font-mono text-xs font-semibold text-slate-600 dark:text-slate-300">
                       {pago.id_pago}

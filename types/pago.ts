@@ -1,28 +1,30 @@
 export type EstadoPago = 'completed' | 'refunded'
 
+export type Moneda = 'COP' | 'USD' | 'EUR'
+
 export interface Pago {
   id_pago: string
   email: string
   nombre: string
   curso: string
   importe: number
-  moneda: string
+  moneda: Moneda
   estado: EstadoPago
   fecha: string
 }
 
 export interface KPIs {
   ingresosTotales: number
-  monedaDominante: string
+  monedaDominante: Moneda
   numPagos: number
   numReembolsos: number
   ticketMedio: number
-  ingresosPorMoneda: Record<string, number>
+  ingresosPorMoneda: Record<Moneda, number>
 }
 
 export interface IngresosPorCurso {
   curso: string
   ingresos: number
   pagos: number
-  moneda: string
+  moneda: Moneda
 }
