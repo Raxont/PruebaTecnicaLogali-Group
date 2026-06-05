@@ -1,21 +1,11 @@
 'use client'
 
 import type { KPIs } from '@/types/pago'
+import { formatCurrencyLocalized, formatAmount } from '@/lib/formatters'
 
 interface KpiCardsProps {
   kpis: KPIs | null
   isLoading?: boolean
-}
-
-function formatCurrency(amount: number, currency: string): string {
-  const decimals = (amount === 0 || currency === 'COP') ? 0 : 2;
-
-  return new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(amount)
 }
 
 export function KpiCards({ kpis, isLoading = false }: KpiCardsProps) {
@@ -60,10 +50,10 @@ export function KpiCards({ kpis, isLoading = false }: KpiCardsProps) {
   const cards = [
     {
       label: 'Ingresos Totales',
-      value: formatCurrency(kpis.ingresosTotales, kpis.monedaDominante),
+      value: formatCurrencyLocalized(kpis.ingresosTotales, kpis.monedaDominante),
       sub: Object.entries(kpis.ingresosPorMoneda)
         .filter(([m]) => m !== kpis.monedaDominante)
-        .map(([m, v]) => formatCurrency(v, m))
+        .map(([m, v]) => formatAmount(v, m))
         .join(' · ') || null,
       icon: '💰',
       accent: 'from-emerald-500 to-teal-600',
@@ -92,7 +82,7 @@ export function KpiCards({ kpis, isLoading = false }: KpiCardsProps) {
     },
     {
       label: 'Ticket Medio',
-      value: formatCurrency(kpis.ticketMedio, kpis.monedaDominante),
+      value: formatCurrencyLocalized(kpis.ticketMedio, kpis.monedaDominante),
       sub: 'por pago completado',
       icon: '📊',
       accent: 'from-violet-500 to-purple-600',

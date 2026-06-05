@@ -1,21 +1,13 @@
-'use client'
+"use client"
 
 import { useState } from 'react'
 import type { KPIs, Pago, Moneda } from '@/types/pago'
+import { formatCurrencyCOP } from '@/lib/formatters'
 
 const tasasCambio: Record<Moneda, number> = {
   COP: 1,
   USD: 3600,
   EUR: 4200,
-}
-
-function formatCurrencyCOP(value: number) {
-  return new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value)
 }
 
 interface AlertListProps {

@@ -5,6 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
+import { formatAmount } from '@/lib/formatters'
 import type { IngresosPorCurso } from '@/types/pago'
 
 interface ChartIngresosProps {
@@ -26,11 +27,7 @@ const CustomTooltip = ({
 }) => {
   if (!active || !payload?.length) return null
   const item = payload[0]
-  const formatted = new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: item.payload.moneda,
-    minimumFractionDigits: 0,
-  }).format(item.value)
+  const formatted = formatAmount(item.value, item.payload.moneda)
   const pct = total > 0 ? ((item.value / total) * 100).toFixed(1) : '0'
 
   return (

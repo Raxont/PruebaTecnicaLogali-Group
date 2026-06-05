@@ -19,31 +19,7 @@ const ESTADO_CONFIG: Record<EstadoPago, { label: string; classes: string }> = {
   }
 }
 
-function formatImporte(importe: number, moneda: string): string {
-  const monedaUpper = moneda.toUpperCase()
-  
-  // 1. Formateamos el número base con la estructura de Colombia (puntos en miles, comas en decimales)
-  const numeroFormateado = new Intl.NumberFormat('es-CO', {
-    minimumFractionDigits: monedaUpper === 'COP' ? 0 : 2,
-    maximumFractionDigits: monedaUpper === 'COP' ? 0 : 2,
-  }).format(importe)
-
-  // 2. Si es COP, retornamos el clásico "$ 120.000"
-  if (monedaUpper === 'COP') {
-    return `$ ${numeroFormateado}`
-  }
-
-  // 3. Si es USD o cualquier otra moneda, forzamos la estructura "$ 20,00 USD"
-  return `$ ${numeroFormateado} ${monedaUpper}`
-}
-
-function formatFecha(fecha: string): string {
-  return new Date(fecha).toLocaleDateString('es-CO', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
-}
+import { formatAmount, formatDateShort } from '@/lib/formatters'
 
 function exportToCSV(pagos: Pago[]): void {
   const headers = ['ID Pago', 'Nombre', 'Email', 'Curso', 'Importe', 'Moneda', 'Estado', 'Fecha']
@@ -212,7 +188,7 @@ export function TablaPagos({ pagos }: TablaPagosProps) {
                     </td>
                     <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{pago.curso}</td>
                     <td className="px-4 py-3 font-semibold text-slate-900 dark:text-white whitespace-nowrap">
-                      {formatImporte(pago.importe, pago.moneda)}
+                      {formatAmount(pago.importe, pago.moneda)}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
@@ -233,7 +209,7 @@ export function TablaPagos({ pagos }: TablaPagosProps) {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                      {formatFecha(pago.fecha)}
+                      {formatDateShort(pago.fecha)}
                     </td>
                   </tr>
                 )
