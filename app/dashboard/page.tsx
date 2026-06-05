@@ -1,5 +1,6 @@
 import { getPagos, calcularKPIs, calcularIngresosPorCurso } from '@/lib/supabase'
 import { KpiCards } from '@/components/ui/KpiCards'
+import { SimulatePurchase } from '@/components/ui/SimulatePurchase'
 import { AlertList } from '@/components/ui/AlertList'
 import { TablaPagos } from '@/components/ui/TablaPagos'
 import { ChartIngresos } from '@/components/charts/ChartIngresos'
@@ -32,7 +33,12 @@ export default async function DashboardPage() {
         </div>
 
         {/* KPIs */}
-        <KpiCards kpis={kpis} />
+        <div className="flex items-center justify-between gap-4">
+          <KpiCards kpis={kpis} />
+          <div className="hidden sm:flex">
+            <SimulatePurchase />
+          </div>
+        </div>
 
         <AlertList kpis={kpis} pagos={pagos} />
 

@@ -31,7 +31,7 @@ export function AlertList({ kpis, pagos }: AlertListProps) {
   const conversionPct = totalTransacciones > 0 ? (kpis.numPagos / totalTransacciones) * 100 : 0
   const reembolsoPct = totalTransacciones > 0 ? (kpis.numReembolsos / totalTransacciones) * 100 : 0
 
-  const alertaAVisible = reembolsoPct > 10 && !alertaA_Cerrada
+  const alertaAVisible = reembolsoPct > 20 && !alertaA_Cerrada
 
   const pagoAltoValor = pagos
     .filter((p) => p.estado === 'completed')
@@ -43,7 +43,6 @@ export function AlertList({ kpis, pagos }: AlertListProps) {
     .sort((a, b) => b.valorCOP - a.valorCOP)[0]
 
   const alertaBVisible = Boolean(pagoAltoValor) && !alertaAltoValorCerrada
-  const alertaCVisible = conversionPct < 80 && totalTransacciones > 0
 
   return (
     <div className="space-y-2">
