@@ -5,7 +5,6 @@ export type Moneda = 'COP' | 'USD' | 'EUR' | string
 // * Formatea un importe simple según la moneda.
 // * - `COP` se muestra sin decimales.
 // * - `USD` y `EUR` se muestran con 2 decimales.
-// TODO: Añadir soporte multi-locale según preferencias del usuario.
 export function formatAmount(importe: number, moneda: Moneda): string {
   // * Normalizamos la entrada a mayúsculas y sin espacios.
   let m = (moneda || 'COP').toString().trim().toUpperCase()
